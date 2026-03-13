@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container{
+            width:80%;
+            height:70vh;
+            border:2px solid rgb(26, 179, 239);
+            position:relative;
+        }
+        .bottom{
+            position: absolute;
+            bottom:0;
+            display:flex;
+            width:100%;
+        }
+        .bottom input{
+            width:100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chat App</h1>
+    <div class="container">
+        <div class="msgBox"></div>
+        <div class="bottom">
+            <input id="msgInput" type="text" placeholder="enter a message">
+            <button onclick="handleSubmit()">Send</button>
+        </div>
+    </div>
+
+    <script src="http://localhost:3000/socket.io/socket.io.js">
+
+    </script>
+    <script>
+        let username=localStorage.getItem("g6Socket");
+        console.log(username);
+        let socket=io("http://localhost:3000");
+
+        socket.emit('join',username);
+
+        let msgBox=document.querySelector(".msgBox");
+
+        socket.on('message',({type,msg})=>{
+            let p=document.createElement('p');
+            p.innerHTML=`<b>${type}</b>: ${msg}`;
+            msgBox.append(p);
+        })
+
+        let inputTag=document.getElementById("msgInput");
+        function handleSubmit(){
+            let value=inputTag.value;
+            console.log(value);
+            socket.emit('sendMessage',value);
+            
+        }
+
+    </script>
+</body>
+</html>
