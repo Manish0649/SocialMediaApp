@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage'
 import Login from './pages/Login'
 import SignUp from './pages/SignUp'
 import Navbar from './components/Navbar'
+import {ToastContainer , toast} from 'react-toastify'
 function App() {
   const [count, setCount] = useState(0)
 
@@ -17,6 +18,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
         </Routes>
+        <ToastContainer/>
       </BrowserRouter>
     </div>
   )

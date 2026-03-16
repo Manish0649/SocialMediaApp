@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const port = 8090;
 
@@ -18,6 +19,7 @@ app.get('/',(req, res)=>{
     res.send('welcome page')
 })
 
+app.use(cors())  //cors middleware
 
 app.use('/users',userRouter)
 app.use('/posts',postRouter)
