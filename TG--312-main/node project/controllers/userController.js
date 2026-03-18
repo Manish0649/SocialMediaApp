@@ -34,14 +34,14 @@ const loginUser = async(req,res)=>{
         let comparePassword = await bcrypt.compare(password, checkUser.password)//true or false
         if(comparePassword){
             let token=await jwt.sign({_id:checkUser._id}, jwt_secret);
-            return res.json({msg:"user log in successfully" , data:checkUser,token})
+            return res.status(200).json({msg:"user log in successfully" , data:checkUser,token})
         }
         else{
-            return res.json({msg:"wrong password"})
+            return res.status(401).json({msg:"wrong password"})
         }
     }
     else{
-        return res.json({msg:"user not found please signup"})
+        return res.status(401).json({msg:"user not found please signup"})
     }
 }
 
