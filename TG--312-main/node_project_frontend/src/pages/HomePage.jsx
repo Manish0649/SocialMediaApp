@@ -1,50 +1,170 @@
-import React,{useRef , useState} from 'react'
-import { FcAddImage } from 'react-icons/fc'
-import EmojiPicker from 'emoji-picker-react';
-import { BsEmojiWink } from "react-icons/bs";
+import React, { useEffect, useState } from 'react'
+import PostComponent from '../components/PostComponent'
+import AspectRatio from '@mui/joy/AspectRatio';
+import Avatar from '@mui/joy/Avatar';
+import Box from '@mui/joy/Box';
+import Card from '@mui/joy/Card';
+import CardContent from '@mui/joy/CardContent';
+import CardOverflow from '@mui/joy/CardOverflow';
+import Link from '@mui/joy/Link';
+import IconButton from '@mui/joy/IconButton';
+import Input from '@mui/joy/Input';
+import Typography from '@mui/joy/Typography';
+import MoreHoriz from '@mui/icons-material/MoreHoriz';
+import FavoriteBorder from '@mui/icons-material/FavoriteBorder';
+import ModeCommentOutlined from '@mui/icons-material/ModeCommentOutlined';
+import SendOutlined from '@mui/icons-material/SendOutlined';
+import Face from '@mui/icons-material/Face';
+import BookmarkBorderRoundedIcon from '@mui/icons-material/BookmarkBorderRounded';
 
 const HomePage = () => {
-  let inputRef=useRef();
 
-  let token = localStorage.getItem("g6Social")
-  const [show , setShow] = useState(false);
-
-  function handleEmojiClick(){
-    setShow(!show)
+  const [allPosts , setallPost]=useState([]);
+  let getAllPosts= async()=>{
+    let res = await fetch('http://localhost:8090/posts/all');
+    let data = await res.json();
+    console.log(data)
+    console.log(data.posts)
+    setallPost(data.posts)
   }
 
-  function handleEmoji(e){
-    console.log(e.emoji)
-    let inputValue=inputRef.current.value;
-    let ans = inputValue + e.emoji;
-    inputRef.current.value=ans;
-
-  }
+ 
+  useEffect(()=>{
+    getAllPosts();
+  },[])
 
   return (
     <div>
-      <div className='w-[40%] p-4 relative m-auto mt-10 border rounded-md'>
-        <div className='  mb-2 flex item-center gap-2'>
-        <textarea ref={inputRef} className='border p-2 w-full outline-olive-950 rounded-2x1' name="" placeholder='whats in your mind..?' id=''></textarea>
-        <button className='bg-amber-600 rounded py-2 px-4 w-max block m-auto text-white'>Post</button>
-        
-      </div>
-
-
-        <input type="file" hidden id='file' />
-        <div className='flex items-center gap-2'>
-          <label htmlFor='file'>
-          <FcAddImage size={30}/>
-          
-        </label>
-        <BsEmojiWink onClick={handleEmojiClick} color='orange' size={25}/>
-        
-        </div>
-        <div className='absolute top-full mt-2 '>
-          <EmojiPicker open={show} theme='dark' onEmojiClick={handleEmoji}/>
-          </div>
-      </div>
       
+      <PostComponent />
+      {
+        allPosts.map((ele, i) => {
+            return <Card
+      variant="outlined"
+      sx={{margin:'40px auto', minWidth: 300,maxWidth:400, '--Card-radius': (theme) => theme.vars.radius.xs }}
+    >
+      <CardContent orientation="horizontal" sx={{ alignItems: 'center', gap: 1 }}>
+        <Box
+          sx={{
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              bottom: 0,
+              right: 0,
+              m: '-2px',
+              borderRadius: '50%',
+              background:
+                'linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%)',
+            },
+          }}
+        >
+          <Avatar
+            size="sm"
+            src={ele.userId.profilePic}
+            sx={{ p: 0.5, border: '2px solid', borderColor: 'background.body' }}
+          />
+        </Box>
+        <Typography sx={{ fontWeight: 'lg' }}>{ele.userId.name}</Typography>
+        <IconButton variant="plain" color="neutral" size="sm" sx={{ ml: 'auto' }}>
+          <MoreHoriz />
+        </IconButton>
+      </CardContent>
+      <CardOverflow>
+        <AspectRatio>
+          <img src="/static/images/cards/yosemite.jpeg" alt="" loading="lazy" />
+        </AspectRatio>
+      </CardOverflow>
+      <CardContent orientation="horizontal" sx={{ alignItems: 'center', mx: -1 }}>
+        <Box sx={{ width: 0, display: 'flex', gap: 0.5 }}>
+          <IconButton variant="plain" color="neutral" size="sm">
+            <FavoriteBorder />
+          </IconButton>
+          <IconButton variant="plain" color="neutral" size="sm">
+            <ModeCommentOutlined />
+          </IconButton>
+          <IconButton variant="plain" color="neutral" size="sm">
+            <SendOutlined />
+          </IconButton>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mx: 'auto' }}>
+          {[...Array(5)].map((_, index) => (
+            <Box
+              key={index}
+              sx={[
+                {
+                  borderRadius: '50%',
+                  width: `max(${6 - index}px, 3px)`,
+                  height: `max(${6 - index}px, 3px)`,
+                },
+                index === 0
+                  ? { bgcolor: 'primary.solidBg' }
+                  : { bgcolor: 'background.level3' },
+              ]}
+            />
+          ))}
+        </Box>
+        <Box sx={{ width: 0, display: 'flex', flexDirection: 'row-reverse' }}>
+          <IconButton variant="plain" color="neutral" size="sm">
+            <BookmarkBorderRoundedIcon />
+          </IconButton>
+        </Box>
+      </CardContent>
+      <CardContent>
+        <Link
+          component="button"
+          underline="none"
+          textColor="text.primary"
+          sx={{ fontSize: 'sm', fontWeight: 'lg' }}
+        >
+          8.1M Likes
+        </Link>
+        <Typography sx={{ fontSize: 'sm' }}>
+          <Link
+            component="button"
+            color="neutral"
+            textColor="text.primary"
+            sx={{ fontWeight: 'lg' }}
+          >
+            MUI
+          </Link>{' '}
+          The React component library you always wanted
+        </Typography>
+        <Link
+          component="button"
+          underline="none"
+          startDecorator="…"
+          sx={{ fontSize: 'sm', color: 'text.tertiary' }}
+        >
+          more
+        </Link>
+        <Link
+          component="button"
+          underline="none"
+          sx={{ fontSize: '10px', color: 'text.tertiary', my: 0.5 }}
+        >
+          2 DAYS AGO
+        </Link>
+      </CardContent>
+      <CardContent orientation="horizontal" sx={{ gap: 1 }}>
+        <IconButton size="sm" variant="plain" color="neutral" sx={{ ml: -1 }}>
+          <Face />
+        </IconButton>
+        <Input
+          variant="plain"
+          size="sm"
+          placeholder="Add a comment…"
+          sx={{ flex: 1, px: 0, '--Input-focusedThickness': '0px' }}
+        />
+        <Link disabled underline="none" role="button">
+          Post
+        </Link>
+      </CardContent>
+    </Card>
+        })
+      }
     </div>
   )
 }
