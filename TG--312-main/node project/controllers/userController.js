@@ -34,7 +34,7 @@ const loginUser = async(req,res)=>{
         let comparePassword = await bcrypt.compare(password, checkUser.password)//true or false
         if(comparePassword){
             let token=await jwt.sign({_id:checkUser._id}, jwt_secret);
-            return res.status(200).json({msg:"user log in successfully" , data:checkUser,token})
+            return res.status(200).json({msg:"user log in successfully" ,token})
         }
         else{
             return res.status(401).json({msg:"wrong password"})
@@ -43,6 +43,13 @@ const loginUser = async(req,res)=>{
     else{
         return res.status(401).json({msg:"user not found please signup"})
     }
+}
+
+const loggedInUser = async(req,res)=>{
+    let userId=req.user
+    let user = await userCollection.findById(userId);
+    res.status(200).json({user})
+
 }
 
 const updateUser = async(req,res)=>{
@@ -99,5 +106,6 @@ module.exports = {
         loginUser,
         updateUser,
         deleteUser,
-        followUser
+        followUser,
+        loggedInUser
 }
