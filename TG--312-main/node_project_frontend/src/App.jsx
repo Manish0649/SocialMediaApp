@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage'
 import Login from './pages/Login'
 import SignUp from './pages/SignUp'
 import Navbar from './components/Navbar'
+import ForgetPassword from './pages/ForgetPassword'
 import userContext from './context/UserContext'
 import {ToastContainer , toast} from 'react-toastify'
 function App() {
@@ -26,6 +27,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/forgetpassword" element={<ForgetPassword />} />
         </Routes>
         <ToastContainer/>
       </BrowserRouter>

@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate , Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 const Login = () => {
@@ -92,6 +92,9 @@ const Login = () => {
         >
           Login
         </button>
+        <Link to="/forgetpassword" className='text-blue-600 font-medium cursor-pointer hover:underline'>
+          Forgot Password?
+        </Link>
 
         <p className='text-center text-sm text-gray-500 mt-1'>
           Don’t have an account?{' '}

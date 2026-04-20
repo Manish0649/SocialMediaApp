@@ -3,6 +3,10 @@ const salt = bcrypt.genSaltSync(10);
 const userCollection = require('../models/userModel')
 const jwt=require('jsonwebtoken');
 const jwt_secret="manish@123";
+const dotenv = require('dotenv') //to access the env variables
+dotenv.config() 
+const nodemailer = require("nodemailer");
+
 
 const registerUser = async(req, res)=>{
     // console.log(req.body);
@@ -101,11 +105,52 @@ const followUser = async(req, res)=>{
     }
 }
 
+const forgetPassword = async(req, res)=>{
+    const {email} = req.body;
+    let user = await userCollection.findOne({email})
+    if(user){
+        const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false, // use STARTTLS (upgrade connection to TLS after connecting)
+        auth: {
+            user: 'manishbansal5412@gmail.com',
+            pass: process.env.APP_PASSWORD
+        },        
+        });
+    
+try {
+  const info = await transporter.sendMail({
+    from: '"SocialMedia Team" <manishbansal5412@gmail.com>', // sender address
+    to: email, // list of recipients
+    subject: "PassWord Reset", // subject line
+    text: "Hello world?", // plain text body
+    html: "<b>Hello world?</b>", // HTML body
+  });
+
+  console.log("Message sent: %s", info.messageId);
+  // Preview URL is only available when using an Ethereal test account
+  //console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+  return res.status(200).json({msg:"password reset link sent to your email"})
+
+} catch (err) {
+  console.error("Error while sending mail:", err);
+}
+
+
+    }else{
+        return res.status(401).json({msg:"user not found please signup"})
+    }
+        
+}
+
+
 module.exports = {
         registerUser,
         loginUser,
         updateUser,
         deleteUser,
         followUser,
-        loggedInUser
+        loggedInUser,
+        forgetPassword
 }
