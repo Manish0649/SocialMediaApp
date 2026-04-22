@@ -20,6 +20,7 @@ app.get('/',(req, res)=>{
     res.send('welcome page')
 })
 
+app.set('view engine','ejs')
 app.use('/uploads',express.static('uploads'))  //to access the images in uploads folder
 app.use(cors())  //cors middleware
 

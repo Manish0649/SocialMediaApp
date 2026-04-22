@@ -6,6 +6,7 @@ const jwt_secret="manish@123";
 const dotenv = require('dotenv') //to access the env variables
 dotenv.config() 
 const nodemailer = require("nodemailer");
+const randomString = require("randomstring")
 
 
 const registerUser = async(req, res)=>{
@@ -109,6 +110,9 @@ const forgetPassword = async(req, res)=>{
     const {email} = req.body;
     let user = await userCollection.findOne({email})
     if(user){
+        let resetToken = randomString.generate(50)
+        user.resetPasswordToken = resetToken;
+        await user.save();
         const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 587,
@@ -124,8 +128,8 @@ try {
     from: '"SocialMedia Team" <manishbansal5412@gmail.com>', // sender address
     to: email, // list of recipients
     subject: "PassWord Reset", // subject line
-    text: "Hello world?", // plain text body
-    html: "<b>Hello world?</b>", // HTML body
+    text: `click this link to change password \n http://localhost:8090/users/resetPassword/${resetToken}`, // plain text body
+    // html: "<b>Hello world?</b>", // HTML body
   });
 
   console.log("Message sent: %s", info.messageId);
@@ -144,6 +148,30 @@ try {
         
 }
 
+const resetPassword = async(req,res)=>{
+    console.log(req.params);
+    const {token} = req.params
+    // res.send("all is well")
+    // res.sendFile(__dirname+'/forgetPassword.html')
+    res.render('forgetPassword', {token})
+}
+
+const updatePassword = async(req,res)=>{
+    const {token} = req.params
+    const {password} = req.body
+    let user = await userCollection.findOne({resetPasswordToken:token})
+    if(user){
+        let hashPassword = await bcrypt.hash(password, salt)
+        user.password = hashPassword;
+        user.resetPasswordToken = '';
+        await user.save();
+        return res.status(200).json({msg:"password updated successfully"})
+    }
+    else{
+        return res.status(401).json({msg:"invalid token"})
+    }
+}
+
 
 module.exports = {
         registerUser,
@@ -152,5 +180,8 @@ module.exports = {
         deleteUser,
         followUser,
         loggedInUser,
-        forgetPassword
+        forgetPassword,
+        resetPassword,
+        updatePassword
+        
 }
