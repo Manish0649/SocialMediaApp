@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const port = 8090;
+// const port = 8090;
 
 
 const mongodbConnection = require('./config/db')  //function
@@ -33,6 +33,8 @@ app.use('/posts',postRouter)
 
 
 
-app.listen(port,()=>{
-    console.log(`server is running on http://localhost:${port}`)
-})
+const port = process.env.PORT || 8090;
+
+app.listen(port, () => {
+  console.log(`server is running on port ${port}`);
+});
