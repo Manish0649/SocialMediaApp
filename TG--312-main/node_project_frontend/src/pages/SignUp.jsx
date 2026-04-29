@@ -26,7 +26,7 @@ const Signup = () => {
     }
 
     try {
-      let res = await fetch('http://localhost:8090/users/register', {
+      let res = await fetch('https://socialmediaapp-aqir.onrender.com/users/register', {
         method: 'POST',
         headers: {
           'content-type': 'application/json'

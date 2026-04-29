@@ -9,7 +9,7 @@ const ForgetPassword = () => {
             email: inputRef.current.value
         }
         console.log(obj)
-        let res = await fetch("http://localhost:8090/users/forgetpassword",{
+        let res = await fetch("https://socialmediaapp-aqir.onrender.com/users/forgetpassword",{
             method:"POST",
             headers:{
                 "Content-Type":"application/json"

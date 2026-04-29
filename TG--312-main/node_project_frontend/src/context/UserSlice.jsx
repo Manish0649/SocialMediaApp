@@ -9,7 +9,7 @@ const UserSlice = (props) => {
     })
 
     async function getUserData(){
-        let res= await fetch("http://localhost:8090/users/loggedInUser",{
+        let res= await fetch("https://socialmediaapp-aqir.onrender.com/users/loggedInUser",{
             method:"GET",
             headers:{
                 'authorization': token,

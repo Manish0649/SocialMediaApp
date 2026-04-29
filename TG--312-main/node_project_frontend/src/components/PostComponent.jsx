@@ -38,7 +38,7 @@ const PostComponent = () => {
     formData.append("title", inputRef.current.value)
     formData.append("image", image)
 
-    let res = await fetch('http://localhost:8090/posts/create', {
+    let res = await fetch('https://socialmediaapp-aqir.onrender.com/posts/create', {
       method: 'POST',
       headers: {
         authorization: token

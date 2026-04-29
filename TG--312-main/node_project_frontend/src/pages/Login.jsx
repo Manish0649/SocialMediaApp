@@ -21,7 +21,7 @@ const Login = () => {
     }
 
     try {
-      const res = await fetch('http://localhost:8090/users/login', {
+      const res = await fetch('https://socialmediaapp-aqir.onrender.com/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -23,7 +23,7 @@ const HomePage = () => {
   const [allPosts , setallPost]=useState([]);
 
   let getAllPosts= async()=>{
-    let res = await fetch('http://localhost:8090/posts/all');
+    let res = await fetch('https://socialmediaapp-aqir.onrender.com/posts/all');
     let data = await res.json();
     console.log(data)
     console.log(data.posts)
@@ -139,7 +139,7 @@ const HomePage = () => {
                 >
                   <img
                     className='h-[380px] w-full object-cover object-center'
-                    src={`http://localhost:8090/uploads/${ele.file}`}
+                    src={`https://socialmediaapp-aqir.onrender.com/uploads/${ele.file}`}
                     alt=""
                     loading="lazy"
                     style={{ display: 'block' }}

@@ -128,7 +128,7 @@ try {
     from: '"SocialMedia Team" <manishbansal5412@gmail.com>', // sender address
     to: email, // list of recipients
     subject: "PassWord Reset", // subject line
-    text: `click this link to change password \n http://localhost:8090/users/resetPassword/${resetToken}`, // plain text body
+    text: `click this link to change password \n https://socialmediaapp-aqir.onrender.com/users/resetPassword/${resetToken}`, // plain text body
     // html: "<b>Hello world?</b>", // HTML body
   });
 
