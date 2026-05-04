@@ -9,14 +9,24 @@ const UserSlice = (props) => {
     })
 
     async function getUserData(){
-        let res= await fetch("https://socialmediaapp-aqir.onrender.com/users/loggedInUser",{
-            method:"GET",
-            headers:{
-                'authorization': token,
+        try {
+            let res= await fetch("https://socialmediaapp-aqir.onrender.com/users/loggedInUser",{
+                method:"GET",
+                headers:{
+                    'authorization': token,
+                }
+            })
+            if (!res.ok) {
+                console.error('Failed to fetch user data:', res.status);
+                return;
             }
-        })
-        let data = await res.json();
-        setUserData({...userData , user:data.user})
+            let data = await res.json();
+            if (data.user) {
+                setUserData({...userData , user:data.user})
+            }
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        }
     }
 
   return (

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import PostComponent from '../components/PostComponent'
 import AspectRatio from '@mui/joy/AspectRatio';
 import Avatar from '@mui/joy/Avatar';
@@ -21,25 +22,54 @@ import { formatDistanceToNow } from 'date-fns';
 const HomePage = () => {
 
   const [allPosts , setallPost]=useState([]);
+  const [filteredPosts, setFilteredPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('search');
 
   let getAllPosts= async()=>{
-    let res = await fetch('https://socialmediaapp-aqir.onrender.com/posts/all');
-    let data = await res.json();
-    console.log(data)
-    console.log(data.posts)
-    setallPost(data.posts)
+    try {
+      setLoading(true);
+      let res = await fetch('https://socialmediaapp-aqir.onrender.com/posts/all');
+      let data = await res.json();
+      console.log(data)
+      console.log(data.posts)
+      setallPost(data.posts || [])
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      setallPost([]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(()=>{
     getAllPosts();
   },[])
 
+  // Filter posts based on search query
+  useEffect(() => {
+    if (searchQuery && searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      const filtered = (allPosts || []).filter((post) => {
+        if (!post) return false;
+        const titleMatch = post.title?.toLowerCase().includes(query);
+        const userMatch = post.userId?.name?.toLowerCase().includes(query);
+        return titleMatch || userMatch;
+      });
+      setFilteredPosts(filtered);
+    } else {
+      setFilteredPosts(allPosts || []);
+    }
+  }, [searchQuery, allPosts])
+
   return (
     <Box
       sx={{
         minHeight: '100vh',
-        backgroundColor: '#f5f5f5',
-        py: 3,
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        py: 4,
+        px: 2,
       }}
     >
       <Box
@@ -48,12 +78,91 @@ const HomePage = () => {
           mx: 'auto',
         }}
       >
-        <Box sx={{ mb: 3 }}>
-          <PostComponent />
-        </Box>
+        {/* Show search results info */}
+        {searchQuery && (
+          <Box
+            sx={{
+              mb: 3,
+              p: 2.5,
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85))',
+              borderRadius: '16px',
+              border: '2px solid rgba(168, 85, 247, 0.2)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+              backdropFilter: 'blur(10px)',
+              animation: 'slideUp 0.5s ease-out',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                boxShadow: '0 12px 40px rgba(168, 85, 247, 0.2)',
+                transform: 'translateY(-2px)',
+              }
+            }}
+          >
+            <Typography sx={{ fontSize: '14px', color: '#6b7280', mb: 0.5, fontWeight: 600 }}>
+              🔍 Search results for: <strong style={{ color: '#667eea', fontSize: '15px' }}>"{searchQuery}"</strong>
+            </Typography>
+            <Typography sx={{ fontSize: '13px', color: '#9ca3af' }}>
+              ✨ {filteredPosts.length} {filteredPosts.length === 1 ? 'result' : 'results'} found
+            </Typography>
+          </Box>
+        )}
 
-        {
-          allPosts.map((ele, i) => {
+        {loading ? (
+          <Box
+            sx={{
+              mb: 3,
+              p: 4,
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8))',
+              borderRadius: '16px',
+              border: '2px solid rgba(168, 85, 247, 0.15)',
+              textAlign: 'center',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+              backdropFilter: 'blur(10px)',
+              animation: 'slideUp 0.5s ease-out',
+            }}
+          >
+            <Typography sx={{ fontSize: '16px', color: '#667eea', fontWeight: 600, animation: 'pulse 2s ease-in-out infinite' }}>
+              ⏳ Loading posts...
+            </Typography>
+          </Box>
+        ) : (
+          <>
+            <Box sx={{ mb: 3, animation: 'fadeInUp 0.6s ease-out' }}>
+              <PostComponent />
+            </Box>
+
+            {filteredPosts.length === 0 && searchQuery ? (
+              <Card
+                variant="outlined"
+                sx={{
+                  margin: '24px auto',
+                  minWidth: 300,
+                  maxWidth: 420,
+                  borderRadius: '20px',
+                  overflow: 'hidden',
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85))',
+                  border: '2px solid rgba(168, 85, 247, 0.2)',
+                  boxShadow: '0 12px 40px rgba(0, 0, 0, 0.1)',
+                  backdropFilter: 'blur(10px)',
+                  textAlign: 'center',
+                  p: 4,
+                  animation: 'slideUp 0.6s ease-out',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-8px)',
+                    boxShadow: '0 20px 50px rgba(168, 85, 247, 0.2)',
+                  }
+                }}
+              >
+                <Typography sx={{ fontSize: '32px', mb: 1 }}>🔭</Typography>
+                <Typography sx={{ fontSize: '18px', color: '#667eea', mb: 1, fontWeight: 700 }}>
+                  No posts found
+                </Typography>
+                <Typography sx={{ fontSize: '14px', color: '#9ca3af' }}>
+                  Try searching with different keywords
+                </Typography>
+              </Card>
+            ) : (
+              filteredPosts.filter(post => post && post.userId).map((ele, i) => {
             return (
               <Card
                 key={i}
@@ -62,12 +171,22 @@ const HomePage = () => {
                   margin: '24px auto',
                   minWidth: 300,
                   maxWidth: 420,
-                  borderRadius: '16px',
+                  borderRadius: '20px',
                   overflow: 'hidden',
-                  backgroundColor: '#fff',
-                  border: '1px solid #e5e7eb',
-                  boxShadow: '0 4px 18px rgba(0,0,0,0.06)',
-                  '--Card-radius': '16px',
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,255,255,0.92))',
+                  border: '2px solid rgba(168, 85, 247, 0.15)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+                  '--Card-radius': '20px',
+                  animation: 'slideUp 0.6s ease-out',
+                  animationDelay: `${i * 0.1}s`,
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  backdropFilter: 'blur(10px)',
+                  '&:hover': {
+                    transform: 'translateY(-12px) scale(1.02)',
+                    boxShadow: '0 20px 50px rgba(168, 85, 247, 0.2)',
+                    background: 'linear-gradient(135deg, rgba(255,255,255,1), rgba(255,255,255,0.95))',
+                    border: '2px solid rgba(168, 85, 247, 0.3)',
+                  }
                 }}
               >
                 <CardContent
@@ -98,7 +217,7 @@ const HomePage = () => {
                   >
                     <Avatar
                       size="sm"
-                      src={ele.userId.profilePic}
+                      src={ele.userId?.profilePic || ''}
                       sx={{
                         p: 0.5,
                         width: 40,
@@ -116,7 +235,7 @@ const HomePage = () => {
                       color: '#111827',
                     }}
                   >
-                    {ele.userId.name}
+                    {ele.userId?.name || 'Anonymous'}
                   </Typography>
 
                   <IconButton
@@ -137,13 +256,15 @@ const HomePage = () => {
                     backgroundColor: '#f3f4f6',
                   }}
                 >
-                  <img
-                    className='h-[380px] w-full object-cover object-center'
-                    src={`https://socialmediaapp-aqir.onrender.com/uploads/${ele.file}`}
-                    alt=""
-                    loading="lazy"
-                    style={{ display: 'block' }}
-                  />
+                  {ele.file && (
+                    <img
+                      className='h-95 w-full object-cover object-center'
+                      src={`https://socialmediaapp-aqir.onrender.com/uploads/${ele.file}`}
+                      alt=""
+                      loading="lazy"
+                      style={{ display: 'block' }}
+                    />
+                  )}
                 </CardOverflow>
 
                 <CardContent
@@ -249,7 +370,7 @@ const HomePage = () => {
                       mb: 0.7,
                     }}
                   >
-                    {ele.likes.length} Likes
+                    {(ele.likes?.length || 0)} Likes
                   </Link>
 
                   <Typography
@@ -269,9 +390,9 @@ const HomePage = () => {
                         textDecoration: 'none',
                       }}
                     >
-                      {ele.userId.name}
+                      {ele.userId?.name || 'Anonymous'}
                     </Link>
-                    {ele.title}
+                    {ele.title || 'Untitled'}
                   </Typography>
 
                   <Link
@@ -299,7 +420,7 @@ const HomePage = () => {
                       letterSpacing: '0.4px',
                     }}
                   >
-                    {formatDistanceToNow(new Date(ele.createdAt), { addSuffix: true })}
+                    {ele.createdAt ? formatDistanceToNow(new Date(ele.createdAt), { addSuffix: true }) : 'Recently'}
                   </Link>
                 </CardContent>
 
@@ -352,8 +473,10 @@ const HomePage = () => {
                 </CardContent>
               </Card>
             )
-          })
-        }
+            })
+        )}
+          </>
+        )}
       </Box>
     </Box>
   )

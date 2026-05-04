@@ -14,10 +14,10 @@ function App() {
   let ctx = useContext(userContext);
   console.log(ctx);
   useEffect(()=>{
-    if(token){
+    if(token && ctx && typeof ctx.getUserData === 'function'){
       ctx.getUserData()
     }    
-  },[token])
+  },[token, ctx])
 
   return (
     <div>
